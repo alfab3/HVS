@@ -1,0 +1,111 @@
+# Python script for user to set voltage.
+# Author: Andrew Schick and Daniel Lis
+# License: MIT License
+
+import time
+
+#Import the module
+import Adafruit_MCP4725
+
+#import the ADC module class
+import mcp3428
+import smbus
+import numpy as np
+import matplotlib.pyplot as plt
+from numpy import linalg
+#create bus object 
+bus = smbus.SMBus(1)
+#create a dictionary of addresses and information needed for the ADC instance
+kwargs = {'address': 0x68, 'mode': 0x10, 'sample_rate': 0x08, 'gain':0x00}
+
+#crate a ADC instance directing towards the bus with the addresses located in kwargs
+mcp3428 = mcp3428.MCP3428(bus, kwargs)
+
+# Create a DAC instance for the voltage input (DAC97) and the current max input
+# (DAC96)
+dac96 = Adafruit_MCP4725.MCP4725(address=0x60, busnum=1)
+dac97 = Adafruit_MCP4725.MCP4725(address=0x61, busnum=1)
+#Initialization of variables
+
+#How the readings change when they get read into and out of the ADC
+conversionVoltage= 300 * 1800/1709
+conversionCurrent= 3.3/10
+#DAC takes in a bit from 0 to 4095 since it is 12 bits
+#Initial Set to Bit is 0
+bitVoltage = 0
+dac97.set_voltage(bitVoltage) #set the voltage to zero through the dac instance
+bitCurrent = 0
+dac96.set_voltage(bitCurrent)
+#steps to follow
+#1. While loop that keeps on going through
+
+loopBool = int(input('1 or 0: do you want a loop?'))
+
+print('\r\n')
+print('-----------')
+print('\r\n')
+print ('Press ctrl-C to exit...')
+
+
+while loopBool == 0:
+    bitVoltage = int(input('Enter Voltage Bit: '))
+    bitCurrent = int(input('Enter Max Current bit: '))
+    
+    dac97.set_voltage(bitVoltage)
+    dac96.set_voltage(bitCurrent)
+    time.sleep(.1)
+    print ('Setting Voltage to : ' + str(bitVoltage))
+    print ('\r\n')
+    print ('------------')
+    print('\r\n')
+    print ('Voltage: ' + str(mcp3428.take_single_reading(0)*conversionVoltage))
+    print('\r\n')
+    print('------------')
+    print('\r\n')
+    print('Setting Max Current to : ' + str(bitCurrent))
+    print('\r\n')
+    print('------------')
+    print('\r\n')
+    print('Current: ' + str(mcp3428.take_single_reading(1)*conversionCurrent))
+
+while loopBool == 1:
+    voltages = np.zeros(4096)
+    currents = np.zeros(4096)
+    saveVoltage = 0
+    saveCurrent = 0
+    for i in range(4096):
+    
+        dac97.set_voltage(i)
+        dac96.set_voltage(i)
+            
+        voltage = mcp3428.take_single_reading(0)
+        current = mcp3428.take_single_reading(1)
+
+        print(str(i) + ' ---> Voltage: ' + str(voltage) + ' | Current: ' + str(current))
+        voltages[i] = float(voltage)
+        currents[i] = float(current)
+
+    
+    bitRange = np.arange(4096)
+
+    bitRange = bitRange[:,np.newaxis]
+    mVolt,_,_,_ = np.linalg.lstsq(bitRange, voltages)
+    mCurr,_,_,_ = np.linalg.lstsq(bitRange, currents)
+    
+    plt.figure(figsize=(6,2))
+
+    plt.subplot(121)
+    plt.plot(bitRange, voltages)
+    plt.xlabel('bit')
+    plt.ylabel('Reading')
+    plt.title('Voltage Conversion: '+ str(mVolt))
+
+    plt.subplot(122)
+    plt.plot(bitRange, currents)
+    plt.xlabel('bit')
+    plt.ylabel('Reading')
+    plt.title('Max Current Conversion: ' + str(mCurr))
+    plt.show()
+    break
+        
+        
