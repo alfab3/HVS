@@ -29,7 +29,12 @@ dac97 = Adafruit_MCP4725.MCP4725(address=0x61, busnum=1)
 voltageConversion = 300 * 1800 / 1709
 currentConversion = 3.3/10
 
-        
+def voltageRampCheck():
+    currentReading = mcp3428.take_single_reading(1)
+    current = currentReading * currentConversion
+    voltageReading = mcp3428.take_single_reading(0)
+    voltage = voltageReading * voltageConversion
+    return voltage, current
 
 def voltage_ramp_up(goalVoltage):
     
@@ -64,9 +69,9 @@ def voltage_ramp_up(goalVoltage):
 
         currentReading = mcp3428.take_single_reading(1)
         current = currentReading * currentConversion
-
         voltageReading = mcp3428.take_single_reading(0)
         voltage = voltageReading * voltageConversion
+
         #resets the prevTime variable for the next increment
         prevTime = livetime
         print('-----------------------------')        
