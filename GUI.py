@@ -9,7 +9,7 @@ from Tkinter import *
 import Tkinter as tk
 import time
 import voltage_ramp
-from voltage_ramp import voltageRampInit, voltage_ramp_up, voltage_ramp_down, voltage
+from voltage_ramp import voltageRampInit, voltage_ramp_up, voltage_ramp_down
 import random
 
 mainWindow = Tk()
@@ -64,16 +64,12 @@ class Window(Frame):
 
 #voltage ramp function
     def r_Entry(self, goalVoltage):
-        #initial current and voltage readings passed from the ADC and passed through conversion
-        #in_curReading = self.mcp3428.take_single_reading(1)
-        #in_cur = in_curReading * self.currentConversion
-        #in_volReading = self.mcp3428.take_single_reading(0)
-        #in_volt = in_volReading * self.voltageConversion
 
-        voltageRampInit(goalVoltage)
+        #Get values of voltage and current
+        voltage, current = voltageRampCheck()
         
         #check for ramp up or ramp down 
-        if goalVoltage > voltage_ramp.voltage:
+        if goalVoltage > voltage:
             voltage_ramp_up(goalVoltage)
             ramp_up = True
             ramp_down = False
@@ -100,14 +96,12 @@ class Window(Frame):
             if liveT - prevT < 1:
                 continue
             #takes new readings every pass to print updated information
-            #curReading = self.mcp3428.take_single_reading(1)
-            #cur = curReading * self.currentConversion
-            #volReading = self.mcp3428.take_single_reading(0)
-            #volt = volReading * self.voltageConversion
+            voltage, current = voltageRampCheck()
+            
             #update time:
             prevTime = livetime
-            #print readings from ADC
             
+            #print readings from ADC
             self.text_box.configure(state = 'normal')
             self.text_box.insert(tk.END, 'Voltage: ' + str(volt) + '\n')
             self.text_box.insert(tk.END, '-------------------\n')

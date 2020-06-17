@@ -29,6 +29,7 @@ dac97 = Adafruit_MCP4725.MCP4725(address=0x61, busnum=1)
 voltageConversion = 300 * 1800 / 1709
 currentConversion = 3.3/10
 
+#returns voltage and current
 def voltageRampCheck():
     currentReading = mcp3428.take_single_reading(1)
     current = currentReading * currentConversion
@@ -60,7 +61,7 @@ def voltage_ramp_up(goalVoltage):
     #begin while loop of increments and decrements
     while 1:
         # read the voltage at the beginning of each iteration.
-        # these readings are from 0 to 10 V, so convert wisel
+        # these readings are from 0 to 10 V, so convert wisely
 
         #get the livetime and what until 1 second passes
         livetime = time.time()
@@ -89,10 +90,11 @@ def voltage_ramp_up(goalVoltage):
             hold_value(goalVoltage, bitVoltage)
 
 def voltage_ramp_down(goalVoltage):
-    init_voltageReading = mcp3428.take_single_reading(0)
-    bitVoltage = init_voltageReading
-    init_currentReading = mcp3428.take_single_reading(1)
-    bitCurrent = init_currentReading
+    #get initial values
+    voltageReading = mcp3428.take_single_reading(0)
+    bitVoltage = voltageReading
+    currentReading = mcp3428.take_single_reading(1)
+    bitCurrent = currentReading
     prevTime = time.time()
 
     while 1:
@@ -114,13 +116,13 @@ def voltage_ramp_down(goalVoltage):
         print('max current: ' + str(current))
         print('-----------------------------')
 
-        if voltage > goalVoltage:
+        if voltage > goalVoltage and voltage >= 60 :
             bitVoltage -= 50
             print('bit: ' + str(bitVoltage))
             print('-----------------------------')
             dac97.set_voltage(bitVoltage)
-        else:
-            hold_value(goalVoltage, bitVoltage)
+        if voltage < 60:
+            dac97.set_voltage(0)
 
 
 

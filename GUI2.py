@@ -8,7 +8,7 @@ from Tkinter import *
 import Tkinter as tk
 import time
 import voltage_ramp
-from voltage_ramp import voltageRampInit, voltage_ramp_up, voltage_ramp_down
+from voltage_ramp import voltageRampCheck, voltage_ramp_up, voltage_ramp_down
 import random
 
 mainWindow = Tk()
@@ -62,11 +62,11 @@ class Window(Frame):
         voltage, current = voltageRampCheck()
 
         if goalVoltage > voltage:
-            #voltage_ramp_up(goalVoltage)
+            voltage_ramp_up(goalVoltage)
             ramp_up = True
             print('I am ramping up')
         else:
-            #voltage_ramp_down(goalVoltage)
+            voltage_ramp_down(goalVoltage)
             ramp_down = True
             print('I am ramping down')
     def ramp_Entry_Check(self):
