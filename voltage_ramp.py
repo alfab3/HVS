@@ -128,6 +128,7 @@ def voltage_ramp_down(goalVoltage):
 
 def hold_value(goalVoltage, bitVoltage):
     print('Bringing to ' + str(goalVoltage) + 'Volts.....')
+    counts = 0
     while 1:
         voltageReading = mcp3428.take_single_reading(0)
         voltage = voltageReading * voltageConversion
@@ -141,6 +142,10 @@ def hold_value(goalVoltage, bitVoltage):
             print('voltage: ' + str(mcp3428.take_single_reading(0) * voltageConversion))
         else:
             continue
+
+        counts += 1
+        if counts >= 20:
+            break
         
 #reset the parameters of the ramp below, then run the function voltage_ramp.exe
 if __name__ == '__main__':

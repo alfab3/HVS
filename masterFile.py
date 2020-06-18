@@ -1,8 +1,6 @@
-#GUI for the HVS
+#masterFile for  HVS
 #Written by Albert Fabrizi
-#This file is mainly for testing purposes. The text box does not work for now so this
-#code doesn't use it
-#Version: June 16, 2020 16:00
+#Version: June 18, 2020 12:55
 
 from Tkinter import *
 import Tkinter as tk
@@ -52,6 +50,11 @@ class Window(Frame):
         v_Activate = Button(mainWindow, text='Enter', command=self.ramp_Entry_Check)
         v_Activate.grid(row = 0, column = 2)
 
+        self.text_box = Text(mainWindow, height=15, width=45)
+        self.text_box.grid(row=3, column=1)
+        self.text_box.insert(tk.INSERT,'-----\n\n')
+        self.text_box.configure(state='disabled')
+
     #voltage ramp function
     def r_Entry(self, goalVoltage):
 
@@ -61,12 +64,19 @@ class Window(Frame):
         #Get values of voltage and current
         voltage, current = voltageRampCheck()
 
+        self.text_box.configure(state= 'normal')
+        self.text_box.insert(tk.END,'Voltage start at ' + str(voltage) + '...\n')
+        self.text_box.insert(tk.END,'-------\n')
+        self.text_box.insert(tk.END,'Max Current Set to ' + str(current) + '\n')
+        self.text_box.insert(tk.END,'------\n')
+
         if goalVoltage > voltage:
             voltage_ramp_up(goalVoltage)
             ramp_up = True
         else:
             voltage_ramp_down(goalVoltage)
             ramp_down = True
+        
     def ramp_Entry_Check(self):
         rampV = self.v_Entry.get()
         check = None
