@@ -1,4 +1,4 @@
-#masterFile for  HVS
+#masterFile for HVS
 #Written by Albert Fabrizi
 #Version: June 18, 2020 12:55
 
@@ -33,7 +33,7 @@ class Window(Frame):
         menu = Menu(mainWindow)
         mainWindow.config(menu = menu)
 
-        #file cascafe menu
+        #file cascade menu
         file_C = Menu(menu)
         file_C.add_command(label='Exit', command = self.close_window)
         menu.add_cascade(label='File', menu=file_C)
@@ -50,10 +50,6 @@ class Window(Frame):
         v_Activate = Button(mainWindow, text='Enter', command=self.ramp_Entry_Check)
         v_Activate.grid(row = 0, column = 2)
 
-        self.text_box = Text(mainWindow, height=15, width=45)
-        self.text_box.grid(row=3, column=1)
-        self.text_box.insert(tk.INSERT,'-----\n\n')
-        self.text_box.configure(state='disabled')
 
     #voltage ramp function
     def r_Entry(self, goalVoltage):
@@ -64,11 +60,6 @@ class Window(Frame):
         #Get values of voltage and current
         voltage, current = voltageRampCheck()
 
-        self.text_box.configure(state= 'normal')
-        self.text_box.insert(tk.END,'Voltage start at ' + str(voltage) + '...\n')
-        self.text_box.insert(tk.END,'-------\n')
-        self.text_box.insert(tk.END,'Max Current Set to ' + str(current) + '\n')
-        self.text_box.insert(tk.END,'------\n')
 
         if goalVoltage > voltage:
             voltage_ramp_up(goalVoltage)

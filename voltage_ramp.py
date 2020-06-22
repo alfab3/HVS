@@ -132,7 +132,10 @@ def hold_value(goalVoltage, bitVoltage):
     while 1:
         voltageReading = mcp3428.take_single_reading(0)
         voltage = voltageReading * voltageConversion
-        
+
+        if counts >= 20:
+            break
+        counts = counts + 1
         if voltage < (goalVoltage - 1):
             bitVoltage += 1
             dac97.set_voltage(bitVoltage)
@@ -140,12 +143,6 @@ def hold_value(goalVoltage, bitVoltage):
             bitVoltage -= 1
             dac97.set_voltage(bitVoltage)
             print('voltage: ' + str(mcp3428.take_single_reading(0) * voltageConversion))
-        else:
-            continue
-
-        counts += 1
-        if counts >= 20:
-            break
         
 #reset the parameters of the ramp below, then run the function voltage_ramp.exe
 if __name__ == '__main__':
